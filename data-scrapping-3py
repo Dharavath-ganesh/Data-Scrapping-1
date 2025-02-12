@@ -1,0 +1,36 @@
+from contextlib import AbstractAsyncContextManager
+from bs4 import BeautifulSoup
+import pandas as pd
+import requests
+density_response = requests.get("https://visaguide.world/asia/")
+s=BeautifulSoup(density_response.text,"html.parser") 
+ta=s.find_all("table")
+table=ta[1]
+h=s.find_all("th")
+headers=[]
+for i in h:
+    title=i.text
+    headers.append(title)
+headers 
+rows=ta[1].find_all("td")
+country=[]
+for i in rows[::4]:
+  country.append(i.text.strip())
+capital=[]
+for i in rows[1::4]:
+  capital.append(i.text.strip())
+  area=[]
+for i in rows[2::4]:
+  area.append(i.text.strip())
+  population=[]
+for i in rows[3::4]:
+  population.append(i.text.strip())
+dic={}
+dic.update({headers[0]:country})
+dic.update({headers[1]:capital})
+dic.update({headers[2]:area})
+dic.update({headers[3]:population}) 
+data=pd.DataFrame(dic)
+data.to_csv("density.csv")
+data
+   
